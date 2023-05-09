@@ -16,7 +16,7 @@ administer helper categories:
   description: 'Grant access to create, edit and manage Site Studio helper categories.'
 
 permission_callbacks:
-  - \Drupal\cohesion_elements\CategoryPermissions::getPermissions
+  - \Drupal\cohesion_elements\CohesionElementsPermissions::elementsPermissions
 
 use custom component builder:
   title: Site Studio custom component builder
