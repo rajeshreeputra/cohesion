@@ -3,6 +3,7 @@
 namespace Drupal\cohesion_sync\Services;
 
 use Drupal\cohesion_sync\Exception\PackageSourceMissingPropertiesException;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\Exception\DirectoryNotReadyException;
@@ -31,19 +32,30 @@ class DefaultModulePackage implements PackageSourceServiceInterface {
   protected $extensionPathResolver;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * DefaultModulePackage constructor.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   Module handler service.
    * @param \Drupal\Core\Extension\ExtensionPathResolver $extensionPathResolver
    *   Factory for getting extension lists by type.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    */
   public function __construct(
     ModuleHandlerInterface $moduleHandler,
     ExtensionPathResolver $extensionPathResolver,
+    ConfigFactoryInterface $configFactory,
   ) {
     $this->moduleHandler = $moduleHandler;
     $this->extensionPathResolver = $extensionPathResolver;
+    $this->$configFactory = $configFactory;
   }
 
   /**
@@ -76,12 +88,44 @@ class DefaultModulePackage implements PackageSourceServiceInterface {
    *   Thrown if source metadata values are missing.
    */
   public function preparePackage(array $sourceMetadata): string {
+    $all_dependencies = $sourceMetadata['dependencies'] ?? [];
+    if ($all_dependencies) {
+      foreach ($all_dependencies as $key => $dependencies) {
+        foreach ($dependencies as $dependency) {
+          switch ($key) {
+            case 'config':
+              if (!$this->isConfigExists($dependency)) {
+                return "";
+              }
+              break;
+            case 'module':
+              if (!$this->moduleHandler->moduleExists($dependency)) {
+                return "";
+              }
+              break;
+          }
+        }
+      }
+    }
     $this->validateMetadata($sourceMetadata);
 
     $module_path = $this->extensionPathResolver->getPath('module', $sourceMetadata['module_name']);
     $package_path = $sourceMetadata['path'];
 
     return $module_path . '/' . $package_path;
+  }
+
+  /**
+   * Check if a configuration exists.
+   *
+   * @param string $config_name
+   *   The name of the configuration to check.
+   *
+   * @return bool
+   *   TRUE if the configuration exists, FALSE otherwise.
+   */
+  protected function isConfigExists($config_name) {
+    return $this->$configFactory->get($config_name)->isNew() === FALSE;
   }
 
   /**
