@@ -11,6 +11,8 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
+use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -48,6 +50,7 @@ use Drupal\field\Entity\FieldStorageConfig;
  *     "uuid" = "uuid",
  *     "revision" = "revision",
  *     "langcode" = "langcode",
+ *     "published" = "status",
  *   },
  *   common_reference_revisions_target = TRUE,
  *   default_reference_revision_settings = {
@@ -71,10 +74,15 @@ use Drupal\field\Entity\FieldStorageConfig;
  *   }
  * )
  */
-class CohesionLayout extends ContentEntityBase implements CohesionLayoutInterface, EntityJsonValuesInterface, EntityUpdateInterface {
+class CohesionLayout extends ContentEntityBase implements
+  CohesionLayoutInterface,
+  EntityJsonValuesInterface,
+  EntityUpdateInterface,
+  EntityPublishedInterface {
 
   use EntityNeedsSaveTrait;
   use EntityJsonValuesTrait;
+  use EntityPublishedTrait;
 
   /**
    * @var null
@@ -459,6 +467,8 @@ class CohesionLayout extends ContentEntityBase implements CohesionLayoutInterfac
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
     $fields = parent::baseFieldDefinitions($entity_type);
+    // Add the published field.
+    $fields += static::publishedBaseFieldDefinitions($entity_type);
 
     $fields['json_values'] = BaseFieldDefinition::create('string_long')->setLabel(t('Values'))->setDefaultValue('{}')->setRevisionable(TRUE)->setTranslatable(TRUE);
 

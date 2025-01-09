@@ -352,7 +352,7 @@ function cohesion_templates_theme() {
  */
 function cohesion_templates_theme_suggestions_page_alter(array &$suggestions, array $variables) {
   // Only apply master templates if this theme is Site Studio enabled.
-  if (\Drupal::service('cohesion.utils')->currentThemeUseCohesion()) {
+  if (\Drupal::hasContainer() && \Drupal::service('cohesion.utils')->currentThemeUseCohesion()) {
     $master_template_candidate = _cohesion_templates_get_master_template();
     $master_template = 'page__cohesion__' . $master_template_candidate;
     if ($master_template_candidate !== FALSE && (\Drupal::request()->query->get('coh_clean_page') !== 'true')) {

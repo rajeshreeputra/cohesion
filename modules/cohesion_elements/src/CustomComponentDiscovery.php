@@ -296,4 +296,9 @@ class CustomComponentDiscovery implements CustomComponentDiscoveryInterface {
     return $files;
   }
 
+  /**
+   * Clears cached definitions.
+   */
+  public function clearCachedDefinitions() {}
+
 }

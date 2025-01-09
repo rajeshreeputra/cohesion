@@ -99,7 +99,7 @@ function cohesion_elements_library_info_alter(&$libraries, $extension) {
           unset($libraries['global_libraries.matchHeight']);
           unset($libraries['global_libraries.cohMatchHeights']);
           unset($libraries['global_libraries.cohContainerMatchHeights']);
-        };
+        }
 
         if (\Drupal::config('cohesion.frontend.settings')->get('js.parallax_scrolling') == 0) {
           unset($libraries['global_libraries.parallax_scrolling']);

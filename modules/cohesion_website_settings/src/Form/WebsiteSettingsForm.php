@@ -103,6 +103,7 @@ class WebsiteSettingsForm extends CohesionBaseForm {
    */
   public function save(array $form, FormStateInterface $form_state, $redirect = NULL) {
     $triggeringElement = $form_state->getTriggeringElement();
+    $status = '';
 
     if ($this->step == 1) {
       $this->step = 2;

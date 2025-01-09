@@ -68,7 +68,7 @@ class _0024EntityUpdate extends PluginBase implements EntityUpdatePluginInterfac
             $item->machineName = $machine_names[$componentFormItem->getproperty('uuid')];
             $json_values->meta->fieldHistory[] = $item;
           }
-        };
+        }
         $entity->setJsonValue(json_encode($json_values));
 
       }
